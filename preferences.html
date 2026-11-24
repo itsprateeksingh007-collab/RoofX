@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>RoofX – Roommate Matching Preferences</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink: #1d1b20;
+    --muted: #6f6c74;
+    --line: #e8e4e8;
+    --bg: #f6f3f5;
+    --card: #fff;
+    --accent: #a3175b;
+    --accent-soft: #fbeaf2;
+    --accent-border: #e7a9c7;
+    --green: #17795a;
+    --green-soft: #e3f5ee;
+    --green-border: #a9dcc8;
+    --gray-soft: #f1efef;
+    --dark: #1b1730;
+    --shadow: 0 2px 10px rgba(30, 10, 30, .06);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #e7e3e6; color: var(--ink);
+    display: flex; justify-content: center;
+  }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  svg { width: 1em; height: 1em; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+  .app { width: 100%; max-width: 430px; background: var(--bg); min-height: 100dvh; position: relative; padding-bottom: 84px; }
+
+  /* ---------- Header ---------- */
+  .header {
+    position: sticky; top: 0; z-index: 20;
+    background: #fff; padding: 12px 16px;
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    border-bottom: 1px solid var(--line);
+  }
+  .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .logo { width: 36px; height: 36px; border-radius: 10px; background: var(--accent); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 14px; flex: none; }
+  .brand-name { font-weight: 700; font-size: 17px; line-height: 1.1; }
+  .brand-sub { font-size: 11.5px; color: var(--muted); }
+  .brand-pill { display: inline-block; font-size: 11px; font-weight: 600; color: var(--accent); background: var(--accent-soft); border: 1px solid var(--accent-border); padding: 2px 8px; border-radius: 8px; margin-left: 6px; vertical-align: middle; }
+  .head-right { display: flex; align-items: center; gap: 10px; }
+  .loc { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; font-size: 12.5px; font-weight: 500; }
+  .loc::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #1fa56a; }
+  .loc svg { font-size: 12px; }
+  .me { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg,#e8b9a0,#a8745a); border: 2px solid #fff; box-shadow: 0 0 0 1px var(--line); }
+
+  main { padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 20px; box-shadow: var(--shadow); }
+  .card-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .card-title { display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 700; line-height: 1.25; }
+  .card-title .ic { color: var(--accent); font-size: 18px; }
+  .tag { font-size: 11.5px; color: #555; background: var(--gray-soft); padding: 6px 10px; border-radius: 8px; line-height: 1.25; text-align: left; }
+
+  /* ---------- Intro ---------- */
+  .step-row { display: flex; justify-content: space-between; align-items: center; }
+  .step { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; letter-spacing: .08em; color: var(--accent); }
+  .step::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  .progress-pill { font-size: 11.5px; font-weight: 600; color: var(--green); background: var(--green-soft); border: 1px solid var(--green-border); padding: 5px 10px; border-radius: 8px; }
+  .progress { display: flex; gap: 6px; margin: 14px 0 18px; }
+  .progress i { height: 5px; border-radius: 4px; flex: 1; background: #ece6ea; }
+  .progress i.on { background: var(--accent); }
+  .progress i.half { background: #e9a4c5; }
+  h1 { font-size: 24px; line-height: 1.2; font-weight: 700; margin-bottom: 8px; }
+  .lede { color: var(--muted); font-size: 14.5px; line-height: 1.55; }
+
+  /* ---------- 01 Daily rhythm ---------- */
+  .rhythm { display: grid; grid-template-columns: 1.1fr 1fr 1fr; gap: 10px; }
+  .opt { text-align: left; padding: 14px 12px; border-radius: 14px; border: 1px solid var(--line); background: var(--gray-soft); position: relative; transition: .15s; }
+  .opt small { display: block; font-size: 11px; color: var(--muted); }
+  .opt strong { display: block; font-size: 14.5px; font-weight: 700; margin: 8px 0 2px; }
+  .opt .mark { position: absolute; top: 12px; right: 10px; width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid #bbb; }
+  .opt.sel { background: var(--accent-soft); border: 1.5px solid var(--accent); }
+  .opt.sel .mark { border-color: var(--accent); background: var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E") center/70% no-repeat; }
+  .opt.sel small:first-child { color: var(--accent); font-weight: 600; }
+
+  /* ---------- 02 Noise ---------- */
+  .pill-hl { font-size: 11.5px; font-weight: 600; color: var(--green); background: var(--green-soft); border: 1px solid var(--green-border); padding: 5px 10px; border-radius: 10px; line-height: 1.2; }
+  .noise-track { position: relative; height: 24px; margin: 4px 6px 12px; }
+  .noise-track::before { content: ""; position: absolute; left: 0; right: 0; top: 10px; height: 4px; border-radius: 4px; background: #e4dfe3; }
+  .noise-track input { position: absolute; inset: 0; width: 100%; appearance: none; background: transparent; margin: 0; }
+  .noise-track input::-webkit-slider-thumb { appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); border: 3px solid #fff; box-shadow: 0 0 0 1px var(--accent), 0 2px 6px rgba(0,0,0,.2); cursor: pointer; }
+  .noise-track input::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: var(--accent); border: 3px solid #fff; box-shadow: 0 0 0 1px var(--accent); }
+  .noise-labels { display: grid; grid-template-columns: repeat(3, 1fr); font-size: 12px; text-align: center; margin-bottom: 14px; }
+  .noise-labels div:first-child { text-align: left; } .noise-labels div:last-child { text-align: right; }
+  .noise-labels b { display: block; font-weight: 600; color: var(--muted); }
+  .noise-labels span { font-size: 11px; color: #8b8890; }
+  .noise-labels .on b { color: var(--accent); }
+  .note { display: flex; gap: 10px; align-items: flex-start; background: var(--gray-soft); border: 1px solid var(--line); border-radius: 12px; padding: 12px; font-size: 12.5px; color: #555; line-height: 1.4; }
+  .note svg { color: var(--accent); font-size: 16px; margin-top: 1px; }
+
+  /* ---------- 03 Cleanliness ---------- */
+  .radio { width: 100%; text-align: left; display: flex; gap: 12px; padding: 16px; border-radius: 14px; border: 1px solid var(--line); background: var(--gray-soft); margin-bottom: 10px; transition: .15s; }
+  .radio:last-child { margin-bottom: 0; }
+  .radio .dot { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid #aaa; flex: none; margin-top: 1px; display: grid; place-items: center; background: #fff; }
+  .radio .body { flex: 1; }
+  .radio .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .radio strong { font-size: 14px; font-weight: 600; }
+  .radio p { font-size: 12.5px; color: var(--muted); line-height: 1.4; margin-top: 4px; }
+  .radio .badge { font-size: 10.5px; color: #777; }
+  .radio.sel { background: var(--accent-soft); border: 1.5px solid var(--accent); }
+  .radio.sel .dot { border-color: var(--accent); background: var(--accent); }
+  .radio.sel .dot::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #fff; }
+  .radio.sel .badge { font-weight: 700; letter-spacing: .06em; color: var(--accent); background: #f6d3e4; padding: 4px 8px; border-radius: 6px; font-size: 10px; }
+
+  /* ---------- 04 Budget ---------- */
+  .budget-val { text-align: right; font-weight: 700; font-size: 14.5px; line-height: 1.3; color: var(--accent); }
+  .dual { position: relative; height: 28px; margin: 8px 8px 6px; }
+  .dual .rail { position: absolute; left: 0; right: 0; top: 12px; height: 4px; border-radius: 4px; background: #e4dfe3; }
+  .dual .fill { position: absolute; top: 12px; height: 4px; border-radius: 4px; background: var(--accent); }
+  .dual input { position: absolute; inset: 0; width: 100%; appearance: none; background: transparent; pointer-events: none; margin: 0; }
+  .dual input::-webkit-slider-thumb { appearance: none; pointer-events: auto; width: 22px; height: 22px; border-radius: 50%; background: #fff; border: 2px solid var(--accent); cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,.2); }
+  .dual input::-moz-range-thumb { pointer-events: auto; width: 18px; height: 18px; border-radius: 50%; background: #fff; border: 2px solid var(--accent); cursor: pointer; }
+  .range-meta { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--muted); margin-bottom: 18px; }
+  .sub-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .sub-head b { font-size: 13px; font-weight: 600; }
+  .sub-head span { font-size: 12px; color: var(--accent); font-weight: 600; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .area { display: inline-flex; align-items: center; gap: 8px; background: var(--gray-soft); border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; font-size: 13px; }
+  .area button { color: #666; font-size: 12px; display: grid; }
+  .add { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--accent-border); color: var(--accent); background: var(--accent-soft); border-radius: 10px; padding: 9px 14px; font-size: 13px; font-weight: 600; margin-top: 12px; }
+
+  /* ---------- 05 Lifestyle ---------- */
+  .life { display: inline-flex; align-items: center; gap: 7px; border-radius: 999px; padding: 9px 14px; font-size: 13px; font-weight: 600; border: 1px solid var(--line); background: var(--gray-soft); color: #555; transition: .15s; }
+  .life.on.c-pink { background: #a3175b; border-color: #a3175b; color: #fff; }
+  .life.on.c-green { background: #12775a; border-color: #12775a; color: #fff; }
+  .life.on.c-orange { background: #b35a14; border-color: #b35a14; color: #fff; }
+  .life.on.c-purple { background: #7a2a8c; border-color: #7a2a8c; color: #fff; }
+
+  /* ---------- Verified banner ---------- */
+  .verified { background: var(--dark); color: #fff; border-radius: 20px; padding: 20px; display: flex; gap: 14px; align-items: center; position: relative; }
+  .verified .vic { width: 42px; height: 42px; border-radius: 12px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); display: grid; place-items: center; font-size: 20px; flex: none; align-self: flex-start; }
+  .verified h3 { font-size: 15px; line-height: 1.3; margin-bottom: 6px; }
+  .verified p { font-size: 12px; line-height: 1.5; color: #cfc9e0; }
+  .verified .btn { background: #fff; color: var(--dark); font-weight: 700; font-size: 13px; border-radius: 10px; padding: 10px 14px; flex: none; }
+  .verified::after { content: ""; position: absolute; top: 14px; right: 20px; width: 8px; height: 8px; border-radius: 50%; background: #2fd47e; }
+
+  /* ---------- Match ---------- */
+  .section-label { display: flex; justify-content: space-between; align-items: center; margin: 4px 2px -4px; font-size: 12px; font-weight: 700; letter-spacing: .02em; }
+  .live { color: var(--green); background: var(--green-soft); border: 1px solid var(--green-border); font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: 8px; display: inline-flex; gap: 6px; align-items: center; }
+  .live::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+  .match { background: #fff; border: 1.5px solid var(--accent-border); border-radius: 22px; padding: 18px; box-shadow: var(--shadow); }
+  .m-top { display: flex; gap: 12px; align-items: flex-start; }
+  .m-av { width: 54px; height: 54px; border-radius: 14px; background: linear-gradient(135deg,#d9b79c,#8f6d56); position: relative; flex: none; }
+  .m-av::after { content: ""; position: absolute; right: -3px; bottom: -3px; width: 12px; height: 12px; background: #1fa56a; border: 2px solid #fff; border-radius: 50%; }
+  .m-info { flex: 1; }
+  .m-info h4 { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+  .m-info h4 svg { color: var(--green); font-size: 15px; }
+  .m-info p { font-size: 12.5px; color: var(--muted); }
+  .score { text-align: center; background: var(--accent-soft); border: 1px solid var(--accent-border); border-radius: 10px; padding: 6px 10px; font-size: 13px; font-weight: 700; color: var(--accent); line-height: 1.2; }
+  .score small { display: block; font-size: 10px; font-weight: 500; color: #888; margin-top: 4px; text-align: right; }
+  .quote { margin: 16px 0 12px; padding: 14px; border-radius: 12px; background: var(--gray-soft); border: 1px solid var(--line); font-style: italic; font-size: 13px; line-height: 1.55; color: #555; }
+  .m-line { display: flex; justify-content: space-between; align-items: center; padding: 11px 12px; border-radius: 10px; background: var(--accent-soft); border: 1px solid #f2cfe1; font-size: 12.5px; margin-bottom: 10px; }
+  .m-line b { color: var(--accent); }
+  .m-line span { display: flex; align-items: center; gap: 6px; }
+  .m-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .m-tags span { border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; font-size: 12px; background: #fff; }
+  .m-tags .hub { background: var(--accent-soft); color: var(--accent); border-color: #f2cfe1; }
+
+  /* ---------- CTA ---------- */
+  .cta { width: 100%; background: var(--accent); color: #fff; font-weight: 700; font-size: 16.5px; border-radius: 18px; padding: 18px; display: flex; justify-content: center; align-items: center; gap: 10px; box-shadow: 0 8px 20px rgba(163,23,91,.28); }
+  .fine { display: flex; gap: 8px; font-size: 12px; color: var(--muted); line-height: 1.4; padding: 0 4px; }
+  .fine svg { margin-top: 1px; }
+
+  /* ---------- Bottom nav ---------- */
+  .nav { position: fixed; bottom: 0; width: 100%; max-width: 430px; background: #fff; border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(4, 1fr); padding: 10px 0 18px; z-index: 30; }
+  .nav a { text-align: center; text-decoration: none; color: #6b6870; font-size: 11.5px; position: relative; }
+  .nav a svg { display: block; margin: 0 auto 4px; font-size: 24px; }
+  .nav a.active { color: var(--accent); font-weight: 700; }
+  .nav .badge-dot { position: absolute; top: -2px; left: calc(50% + 8px); width: 8px; height: 8px; background: #e11d74; border-radius: 50%; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="brand">
+      <div class="logo">RX</div>
+      <div>
+        <div class="brand-name">RoofX <span class="brand-pill">Flatmate Matching</span></div>
+        <div class="brand-sub">Smart Co-Living Network</div>
+      </div>
+    </div>
+    <div class="head-right">
+      <div class="loc">Indiranagar, BLR <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></div>
+      <div class="me"></div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- Intro -->
+    <section class="card">
+      <div class="step-row">
+        <span class="step">STEP 2 OF 4</span>
+        <span class="progress-pill">Preferences In Progress</span>
+      </div>
+      <div class="progress"><i class="on"></i><i class="half"></i><i></i><i></i></div>
+      <h1>Roommate Matching Preferences</h1>
+      <p class="lede">Set your living habits, budget, and daily rhythm to discover verified flatmates who share your lifestyle standards.</p>
+    </section>
+
+    <!-- 01 Daily rhythm -->
+    <section class="card">
+      <div class="card-head">
+        <div class="card-title"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>01. Daily Rhythm &amp;<br />Schedule</span></div>
+        <span class="tag">Sleep<br />Schedule</span>
+      </div>
+      <div class="rhythm" data-single>
+        <button class="opt sel"><small>6 AM - 10 PM</small><span class="mark"></span><strong>Early Riser</strong><small>Morning focus</small></button>
+        <button class="opt"><small>11 PM - 7 AM</small><span class="mark"></span><strong>Night Owl</strong><small>Late evenings</small></button>
+        <button class="opt"><small>Flexible</small><span class="mark"></span><strong>Adaptable</strong><small>Varies weekly</small></button>
+      </div>
+    </section>
+
+    <!-- 02 Noise -->
+    <section class="card">
+      <div class="card-head">
+        <div class="card-title"><svg class="ic" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg><span>02. Noise &amp; Social<br />Preferences</span></div>
+        <span class="pill-hl" id="noiseTag">Quiet Focus<br />Preferred</span>
+      </div>
+      <div class="noise-track"><input id="noise" type="range" min="0" max="2" step="1" value="0" /></div>
+      <div class="noise-labels" id="noiseLabels">
+        <div class="on"><b>Quiet &amp; Focused</b><span>Deep work &amp; calm</span></div>
+        <div><b>Balanced</b><span>Occasional hosting</span></div>
+        <div><b>Social Hub</b><span>Active weekends</span></div>
+      </div>
+      <div class="note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg>Evenings after 10:30 PM are reserved for quiet downtime.</div>
+    </section>
+
+    <!-- 03 Cleanliness -->
+    <section class="card">
+      <div class="card-head">
+        <div class="card-title"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3l1.8 4.7L18.5 9l-4.7 1.8L12 15.5l-1.8-4.7L5.5 9l4.7-1.3L12 3zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15z"/></svg><span>03. Cleanliness &amp; Shared Space<br />Habits</span></div>
+        <span class="tag">High<br />Standard</span>
+      </div>
+      <div data-single-radio>
+        <button class="radio sel"><span class="dot"></span><span class="body"><span class="row"><strong>Clean As You Go</strong><span class="badge">PREFERRED</span></span><p>Counters and kitchen sink cleaned immediately after use</p></span></button>
+        <button class="radio"><span class="dot"></span><span class="body"><span class="row"><strong>Daily Shared Tidy</strong><span class="badge">Flexible</span></span><p>Common spaces organized together every evening</p></span></button>
+        <button class="radio"><span class="dot"></span><span class="body"><span class="row"><strong>Weekly Professional Deep Clean</strong><span class="badge">Standard</span></span><p>Housekeeper handles weekly cleaning routine</p></span></button>
+      </div>
+    </section>
+
+    <!-- 04 Budget -->
+    <section class="card">
+      <div class="card-head">
+        <div class="card-title"><svg class="ic" viewBox="0 0 24 24"><path d="M6 4h12M6 9h12M9 4c6 0 6 10 0 10H6l9 7"/></svg><span>04. Monthly Budget &amp;<br />Preferred Areas</span></div>
+        <div class="budget-val" id="budgetVal">₹25,000 –<br />₹45,000</div>
+      </div>
+      <div class="dual">
+        <div class="rail"></div><div class="fill" id="fill"></div>
+        <input id="minR" type="range" min="15000" max="75000" step="1000" value="25000" />
+        <input id="maxR" type="range" min="15000" max="75000" step="1000" value="45000" />
+      </div>
+      <div class="range-meta"><span>Min: ₹15,000</span><span>Avg. Indiranagar: ₹32,500/mo</span><span>Max: ₹75,000</span></div>
+
+      <div class="sub-head"><b>Preferred Bengaluru Neighborhoods</b><span id="areaCount">4 Selected</span></div>
+      <div class="chips" id="areas">
+        <span class="area">Indiranagar <button aria-label="Remove"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button></span>
+        <span class="area">Koramangala 4th Block <button aria-label="Remove"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button></span>
+        <span class="area">HSR Layout (Sector 3) <button aria-label="Remove"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button></span>
+        <span class="area">Domlur / EGL <button aria-label="Remove"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button></span>
+      </div>
+      <button class="add" id="addArea"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Add Area</button>
+    </section>
+
+    <!-- 05 Lifestyle -->
+    <section class="card">
+      <div class="card-head">
+        <div class="card-title"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h4v4H4zM4 15h4v4H4zM11 7h9M11 17h9"/></svg><span>05. Lifestyle &amp; House<br />Preferences</span></div>
+        <span class="tag" style="background:none;padding:0;color:#555">Select all that<br />apply</span>
+      </div>
+      <div class="chips" id="life">
+        <button class="life on c-pink">🏠 Work From Home (WFH)</button>
+        <button class="life on c-green">🌱 Vegetarian / Plant-Based Friendly</button>
+        <button class="life">🚭 Non-Smoking</button>
+        <button class="life">🐾 Pet Friendly</button>
+        <button class="life on c-purple">🎧 Sound Sensitive</button>
+        <button class="life on c-orange">☕ Coffee Enthusiast</button>
+        <button class="life">🏋️ Fitness Friendly</button>
+      </div>
+    </section>
+
+    <!-- Verified -->
+    <section class="verified">
+      <div class="vic"><svg viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></div>
+      <div>
+        <h3>RoofX Verified Resident &amp; Escrow</h3>
+        <p>Government ID-verified profiles receive 4.2x faster match responses and automated rent escrow protection in Bangalore.</p>
+      </div>
+      <button class="btn">Verify ID</button>
+    </section>
+
+    <!-- Match -->
+    <div class="section-label"><span>TOP COMPATIBLE FLATMATE MATCH</span><span class="live">Live Match</span></div>
+    <section class="match">
+      <div class="m-top">
+        <div class="m-av"></div>
+        <div class="m-info">
+          <h4>Julian Nair, 26 <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg></h4>
+          <p>Product Designer &amp; Tech Lead • Indiranagar</p>
+        </div>
+        <div class="score">96% Match<small>High lifestyle alignment</small></div>
+      </div>
+      <div class="quote">“Co-founder at an early-stage venture in Indiranagar. I value calm, quiet mornings, clean communal areas, and disciplined shared spaces. Mostly plant-based cooking and love brewing filter coffee.”</div>
+      <div class="m-line"><span>♪ Likes: Ambient / Lo-Fi</span><b>Budget: ₹38,000 / mo</b></div>
+      <div class="m-tags"><span>Schedule: 6:00 AM</span><span>Cleanliness: Very High</span><span class="hub">Bengaluru Tech Hub</span></div>
+    </section>
+
+    <button class="cta">Save &amp; Find Matching Flatmates <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+    <div class="fine"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Preferences are encrypted &amp; can be updated anytime in RoofX Settings</div>
+  </main>
+
+  <!-- Bottom nav -->
+  <nav class="nav">
+    <a href="#"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>Explore</a>
+    <a href="#" class="active"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-4 3-6 6.5-6s6.5 2 6.5 6M16 5a3.5 3.5 0 0 1 0 6.5M18 14c2.5.6 3.8 2.6 3.8 5"/></svg><span class="badge-dot"></span>Matches</a>
+    <a href="#"><svg viewBox="0 0 24 24"><path d="M12 21s-8-5.3-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.7-8 11-8 11z"/></svg>Saved</a>
+    <a href="#"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L3 21l1.9-6.4A8 8 0 1 1 21 12z"/></svg>Messages</a>
+  </nav>
+</div>
+
+<script>
+  // Single-select option groups
+  document.querySelectorAll('[data-single]').forEach(g =>
+    g.addEventListener('click', e => {
+      const b = e.target.closest('.opt'); if (!b) return;
+      g.querySelectorAll('.opt').forEach(x => x.classList.toggle('sel', x === b));
+    }));
+  document.querySelectorAll('[data-single-radio]').forEach(g =>
+    g.addEventListener('click', e => {
+      const b = e.target.closest('.radio'); if (!b) return;
+      g.querySelectorAll('.radio').forEach(x => x.classList.toggle('sel', x === b));
+    }));
+
+  // Noise slider
+  const noise = document.getElementById('noise');
+  const tags = ['Quiet Focus<br>Preferred', 'Balanced<br>Vibe', 'Social Hub<br>Preferred'];
+  noise.addEventListener('input', () => {
+    document.getElementById('noiseTag').innerHTML = tags[noise.value];
+    [...document.getElementById('noiseLabels').children].forEach((c, i) => c.classList.toggle('on', i == noise.value));
+  });
+
+  // Dual budget slider
+  const minR = document.getElementById('minR'), maxR = document.getElementById('maxR');
+  const fill = document.getElementById('fill'), val = document.getElementById('budgetVal');
+  const fmt = n => '₹' + Number(n).toLocaleString('en-IN');
+  function updateBudget(changed) {
+    let lo = +minR.value, hi = +maxR.value;
+    if (lo > hi - 1000) { changed === minR ? (minR.value = lo = hi - 1000) : (maxR.value = hi = lo + 1000); }
+    const min = +minR.min, max = +minR.max;
+    fill.style.left = ((lo - min) / (max - min)) * 100 + '%';
+    fill.style.right = (100 - ((hi - min) / (max - min)) * 100) + '%';
+    val.innerHTML = fmt(lo) + ' –<br>' + fmt(hi);
+  }
+  minR.addEventListener('input', () => updateBudget(minR));
+  maxR.addEventListener('input', () => updateBudget(maxR));
+  updateBudget();
+
+  // Areas
+  const areas = document.getElementById('areas');
+  const countEl = document.getElementById('areaCount');
+  const refreshCount = () => countEl.textContent = areas.children.length + ' Selected';
+  const X = '<svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>';
+  areas.addEventListener('click', e => {
+    const btn = e.target.closest('button'); if (!btn) return;
+    btn.parentElement.remove(); refreshCount();
+  });
+  document.getElementById('addArea').addEventListener('click', () => {
+    const name = prompt('Add a neighbourhood (e.g. Jayanagar)');
+    if (!name || !name.trim()) return;
+    const s = document.createElement('span'); s.className = 'area';
+    s.append(name.trim() + ' ');
+    const b = document.createElement('button'); b.setAttribute('aria-label', 'Remove'); b.innerHTML = X;
+    s.append(b); areas.append(s); refreshCount();
+  });
+
+  // Lifestyle toggles (keeps each chip's colour when on)
+  const colours = ['c-pink', 'c-green', 'c-orange', 'c-purple'];
+  document.getElementById('life').addEventListener('click', e => {
+    const b = e.target.closest('.life'); if (!b) return;
+    if (!colours.some(c => b.classList.contains(c))) b.classList.add('c-green');
+    b.classList.toggle('on');
+  });
+</script>
+</body>
+</html>

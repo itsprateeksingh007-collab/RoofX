@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Empty to Curated — Scroll Frame Animation</title>
+  <style>
+:root{--ink:#20201e;--muted:#72716d;--line:#e6e3dc;--accent:#a3175b;--paper:#f7f5f0}*{box-sizing:border-box}body{margin:0;background:#f8f7f4;color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,sans-serif}.hud-bar{position:fixed;z-index:4;top:16px;left:50%;transform:translateX(-50%);width:min(1200px,calc(100% - 32px));display:flex;justify-content:space-between;align-items:center;gap:14px;padding:12px 16px;border:1px solid #ffffffb0;border-radius:18px;background:#fffdf4e8;box-shadow:0 8px 36px #33250f1a;backdrop-filter:blur(14px)}.hud-left,.hud-center,.hud-right{display:flex;align-items:center;gap:10px}.brand-dot{width:10px;height:10px;border-radius:50%;background:#a3175b}.hud-title{font-weight:700}.badge,.progress-pill{font-size:12px;color:#68675f;background:#f2f0e9;border-radius:99px;padding:7px 10px}.hud-select,.hud-btn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 11px;color:var(--ink);font-size:12px;cursor:pointer}.hud-btn.primary{background:#20201e;color:#fff}.scroll-progress-track{position:fixed;z-index:5;top:0;left:0;width:100%;height:3px}.scroll-progress-fill{height:100%;width:0;background:#a3175b}.scroll-track{height:430vh}.sticky-stage{position:sticky;top:0;height:100vh;overflow:hidden;background:radial-gradient(ellipse at 18% 75%,#e6d8bd 0,transparent 42%),linear-gradient(130deg,#ede7db,#f8f7f3 55%,#e8e3d9)}.stage-inner{height:100%;max-width:1400px;margin:auto;padding:110px 6vw 50px;display:grid;grid-template-columns:minmax(300px,1fr) minmax(360px,.9fr);align-items:center;gap:5vw}.canvas-frame{height:min(72vh,780px);aspect-ratio:720/1280;justify-self:center;position:relative;overflow:hidden;border-radius:22px;box-shadow:0 24px 70px #30231527;background:#e6dfd3}.canvas-frame canvas{width:100%;height:100%;display:block}.canvas-scrim{position:absolute;inset:0;box-shadow:inset 0 0 0 1px #fff8;pointer-events:none}.story-column{display:flex;flex-direction:column;gap:26px}.story-card{display:none;max-width:520px;animation:rise .35s ease}.story-card.active{display:block}.eyebrow{text-transform:uppercase;letter-spacing:.14em;font-size:11px;color:#8b6b47;font-weight:700}.story-card h1,.story-card h2{font-family:Georgia,serif;font-weight:500;letter-spacing:-.035em;font-size:clamp(38px,5vw,70px);line-height:1.02;margin:16px 0}.story-card p{font-size:16px;line-height:1.7;color:#67655f;max-width:460px}.scroll-cue{display:flex;align-items:center;gap:12px;color:#777;font-size:13px;margin-top:42px}.mouse-icon{width:19px;height:29px;border:1.5px solid #777;border-radius:12px;position:relative}.mouse-icon:after{content:"";position:absolute;width:3px;height:6px;border-radius:4px;background:#777;top:5px;left:7px}.chapter-nav{display:flex;flex-wrap:wrap;gap:8px}.chapter-dot{border:1px solid #ddd7cb;background:transparent;padding:9px 13px;border-radius:99px;font-size:12px;color:#777;cursor:pointer}.chapter-dot.active{background:#272621;color:white;border-color:#272621}.chapter-actions{margin-top:24px}.exit-clean-btn{position:fixed;z-index:6;right:20px;top:20px}.hidden{display:none!important}.clean .hud-bar,.clean .chapter-nav,.clean .scroll-progress-track{display:none}.clean .stage-inner{grid-template-columns:1fr}.clean .story-column{display:none}.clean .canvas-frame{height:90vh}.hud-bar select{max-width:200px}@keyframes rise{from{opacity:.3;transform:translateY(8px)}to{opacity:1;transform:none}}@media(max-width:760px){.hud-bar{top:8px;flex-wrap:wrap;width:calc(100% - 16px);padding:9px}.hud-center{display:none}.hud-right{margin-left:auto}.hud-select{max-width:130px}.stage-inner{padding:120px 20px 28px;grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto;gap:12px}.canvas-frame{height:48vh;grid-row:1}.story-column{grid-row:2;gap:10px}.story-card h1,.story-card h2{font-size:34px;margin:8px 0}.story-card p{font-size:13px;margin:6px 0}.scroll-cue{display:none}.chapter-nav{gap:5px}.chapter-dot{padding:7px 9px;font-size:10px}.badge{display:none}}
+</style>
+</head>
+<body>
+  <!-- Top Floating Control Bar -->
+  <header class="hud-bar" id="hudBar">
+    <div class="hud-left">
+      <span class="brand-dot" aria-hidden="true"></span>
+      <span class="hud-title">Room Transformation</span>
+      <span id="preloadBadge" class="badge">Loading frames…</span>
+    </div>
+
+    <div class="hud-center">
+      <div class="progress-pill">
+        <span id="frameReadout" class="mono">Frame 5 (1 / 188)</span>
+        <span class="divider">•</span>
+        <span id="percentReadout" class="mono">0%</span>
+      </div>
+    </div>
+
+    <div class="hud-right">
+      <select id="sequenceModeSelect" class="hud-select" aria-label="Frame sequence mode" title="Choose frame sequence">
+        <option value="edited" selected>Edited Sequence (Skip 1–4, Hold 5×8)</option>
+        <option value="raw">All Raw Frames (1–185)</option>
+      </select>
+      <button id="autoScrollBtn" class="hud-btn" type="button">Auto-Scroll</button>
+      <button id="cleanViewBtn" class="hud-btn" type="button" title="Hide UI overlays for pure viewing">Clean View</button>
+    </div>
+  </header>
+
+  <!-- Floating Exit Clean View Button -->
+  <button id="exitCleanBtn" class="exit-clean-btn hidden" type="button">Show Controls</button>
+
+  <!-- Thin Scroll Progress Line -->
+  <div class="scroll-progress-track" aria-hidden="true">
+    <div id="scrollProgressFill" class="scroll-progress-fill"></div>
+  </div>
+
+  <!-- Main Scroll Sequence Section -->
+  <main>
+    <section id="scrollTrack" class="scroll-track" aria-label="Scroll-driven room transformation">
+      <!-- Sticky Viewport -->
+      <div class="sticky-stage">
+        <div class="stage-inner">
+          <!-- Canvas Showcase -->
+          <div class="canvas-frame">
+            <canvas id="frameCanvas" width="720" height="1280"></canvas>
+            <div class="canvas-scrim" aria-hidden="true"></div>
+          </div>
+
+          <!-- Narrative Beats (Synced to Scroll Progress) -->
+          <aside class="story-column" id="storyColumn">
+            <div class="story-cards-stack">
+              <article class="story-card active" data-start="0" data-end="0.18">
+                <span class="eyebrow">01 / Blank Canvas</span>
+                <h1>Start with Pure Light</h1>
+                <p>Morning sun across bare oak floorboards. Scroll down to watch the room furnish itself frame by frame.</p>
+                <div class="scroll-cue">
+                  <span class="mouse-icon" aria-hidden="true"></span>
+                  <span>Scroll to animate</span>
+                </div>
+              </article>
+
+              <article class="story-card" data-start="0.18" data-end="0.45">
+                <span class="eyebrow">02 / Grounding the Space</span>
+                <h2>Texture &amp; Seating</h2>
+                <p>A woven blue-and-ochre rug anchors the floor while a deep cream sectional settles into the corner light.</p>
+              </article>
+
+              <article class="story-card" data-start="0.45" data-end="0.72">
+                <span class="eyebrow">03 / Warmth &amp; Height</span>
+                <h2>Sculptural Details</h2>
+                <p>A marble coffee table, brass arc floor lamp, fiddle-leaf fig, and floating oak shelves bring balance and life.</p>
+              </article>
+
+              <article class="story-card" data-start="0.72" data-end="1.01">
+                <span class="eyebrow">04 / Final Curation</span>
+                <h2>Statement Finish</h2>
+                <p>Deep velvet cushions and a bold blue-and-gold canvas complete the transformation.</p>
+                <div class="chapter-actions">
+                  <button id="replayTopBtn" class="hud-btn primary" type="button">Back to Top</button>
+                </div>
+              </article>
+            </div>
+
+            <!-- Chapter Dots -->
+            <nav class="chapter-nav" aria-label="Animation chapters">
+              <button class="chapter-dot active" data-progress="0" type="button">01 Empty</button>
+              <button class="chapter-dot" data-progress="0.30" type="button">02 Seating</button>
+              <button class="chapter-dot" data-progress="0.58" type="button">03 Styling</button>
+              <button class="chapter-dot" data-progress="0.92" type="button">04 Final</button>
+            </nav>
+          </aside>
+        </div>
+      </div>
+
+      <!-- Invisible Scroll Milestones for Natural Scroll Length -->
+      <div class="scroll-spacer" aria-hidden="true"></div>
+    </section>
+  </main>
+
+  <script>
+(()=>{const track=document.getElementById('scrollTrack'),canvas=document.getElementById('frameCanvas'),ctx=canvas.getContext('2d'),cards=[...document.querySelectorAll('.story-card')],dots=[...document.querySelectorAll('.chapter-dot')],fill=document.getElementById('scrollProgressFill');let p=0,auto=false,timer;
+function room(q){const w=canvas.width,h=canvas.height;ctx.clearRect(0,0,w,h);let sky=ctx.createLinearGradient(0,0,0,h);sky.addColorStop(0,'#e9e6dc');sky.addColorStop(.63,'#ded9cf');sky.addColorStop(.64,'#cbbba0');sky.addColorStop(1,'#b7a181');ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);ctx.fillStyle='#f7efd9';ctx.globalAlpha=.7;ctx.beginPath();ctx.arc(140,210,100,0,7);ctx.fill();ctx.globalAlpha=1;
+// window
+ctx.fillStyle='#faf6e9';ctx.fillRect(70,110,270,390);ctx.fillStyle='#c4d3d1';ctx.fillRect(84,124,242,360);ctx.fillStyle='#e8e1cd';ctx.fillRect(195,124,9,360);ctx.fillRect(84,300,242,8);ctx.fillStyle='#b99c70';ctx.fillRect(53,495,305,18);
+// floor planks
+ctx.strokeStyle='#a48c69';ctx.globalAlpha=.28;for(let y=680;y<h;y+=90){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}for(let x=0;x<w;x+=145){ctx.beginPath();ctx.moveTo(x,680);ctx.lineTo(x-90,h);ctx.stroke()}ctx.globalAlpha=1;
+// rug fades in
+const a=Math.max(0,Math.min(1,(q-.13)*5));ctx.globalAlpha=a;ctx.fillStyle='#596476';ctx.beginPath();ctx.ellipse(365,970,295,135,0,0,7);ctx.fill();ctx.strokeStyle='#c69a52';ctx.lineWidth=12;ctx.beginPath();ctx.ellipse(365,970,270,112,0,0,7);ctx.stroke();ctx.globalAlpha=1;
+// sofa
+const b=Math.max(0,Math.min(1,(q-.3)*4));ctx.globalAlpha=b;ctx.fillStyle='#e5ddcf';ctx.beginPath();ctx.roundRect(180,690,470,270,35);ctx.fill();ctx.fillRect(155,790,45,160);ctx.fillRect(625,790,45,160);ctx.fillStyle='#d6cbbb';ctx.fillRect(210,930,430,35);ctx.fillStyle='#c4b39e';ctx.beginPath();ctx.roundRect(220,715,180,130,20);ctx.fill();ctx.beginPath();ctx.roundRect(420,715,205,130,20);ctx.fill();ctx.globalAlpha=1;
+// table & lamp
+const c=Math.max(0,Math.min(1,(q-.52)*4));ctx.globalAlpha=c;ctx.fillStyle='#8a755a';ctx.fillRect(350,1005,18,130);ctx.fillRect(490,1005,18,130);ctx.fillStyle='#f2eee6';ctx.beginPath();ctx.ellipse(430,1004,125,32,0,0,7);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=5;ctx.beginPath();ctx.ellipse(430,1001,80,15,0,0,7);ctx.stroke();ctx.strokeStyle='#a68048';ctx.lineWidth=13;ctx.beginPath();ctx.moveTo(600,910);ctx.quadraticCurveTo(580,620,430,570);ctx.stroke();ctx.fillStyle='#e8dab7';ctx.beginPath();ctx.moveTo(390,570);ctx.lineTo(475,570);ctx.lineTo(505,620);ctx.lineTo(360,620);ctx.fill();ctx.globalAlpha=1;
+// plant
+const d=Math.max(0,Math.min(1,(q-.61)*4));ctx.globalAlpha=d;ctx.fillStyle='#926c4e';ctx.beginPath();ctx.roundRect(590,1030,90,120,12);ctx.fill();ctx.strokeStyle='#537254';ctx.lineWidth=12;ctx.beginPath();ctx.moveTo(635,1030);ctx.lineTo(635,810);ctx.stroke();for(const [x,y,r] of [[580,875,-.5],[685,850,.5],[570,790,-.65],[690,770,.65],[625,730,0]]){ctx.fillStyle='#648363';ctx.beginPath();ctx.ellipse(x,y,35,75,r,0,7);ctx.fill()}ctx.globalAlpha=1;
+// art and cushions
+const e=Math.max(0,Math.min(1,(q-.75)*5));ctx.globalAlpha=e;ctx.fillStyle='#b08b55';ctx.fillRect(410,200,200,250);ctx.fillStyle='#29435b';ctx.fillRect(423,214,174,222);ctx.fillStyle='#d7ae5e';ctx.beginPath();ctx.arc(530,300,50,0,7);ctx.fill();ctx.fillStyle='#f0e4cf';ctx.beginPath();ctx.arc(490,350,45,0,7);ctx.fill();ctx.fillStyle='#a3474b';ctx.beginPath();ctx.roundRect(235,745,130,86,20);ctx.fill();ctx.fillStyle='#c18b45';ctx.beginPath();ctx.roundRect(500,747,105,82,20);ctx.fill();ctx.globalAlpha=1;
+}
+function update(){let max=track.offsetHeight-innerHeight;p=Math.max(0,Math.min(1,(scrollY-track.offsetTop)/max));room(p);let n=p<.18?0:p<.45?1:p<.72?2:3;cards.forEach((c,i)=>c.classList.toggle('active',i===n));dots.forEach((d,i)=>d.classList.toggle('active',i===n));document.getElementById('frameReadout').textContent=`Frame ${Math.round(5+p*180)} (${Math.round(1+p*187)} / 188)`;document.getElementById('percentReadout').textContent=Math.round(p*100)+'%';fill.style.width=(p*100)+'%';document.getElementById('preloadBadge').textContent='Illustration ready'}
+window.addEventListener('scroll',update);window.addEventListener('resize',update);dots.forEach(d=>d.onclick=()=>window.scrollTo({top:track.offsetTop+Number(d.dataset.progress)*(track.offsetHeight-innerHeight),behavior:'smooth'}));document.getElementById('replayTopBtn').onclick=()=>window.scrollTo({top:0,behavior:'smooth'});document.getElementById('cleanViewBtn').onclick=()=>{document.body.classList.add('clean');document.getElementById('exitCleanBtn').classList.remove('hidden')};document.getElementById('exitCleanBtn').onclick=()=>{document.body.classList.remove('clean');document.getElementById('exitCleanBtn').classList.add('hidden')};document.getElementById('sequenceModeSelect').onchange=e=>{document.getElementById('preloadBadge').textContent=e.target.value==='raw'?'Illustration · raw mode':'Illustration ready'};document.getElementById('autoScrollBtn').onclick=e=>{auto=!auto;e.target.textContent=auto?'Pause Auto-Scroll':'Auto-Scroll';clearInterval(timer);if(auto)timer=setInterval(()=>{if(p>=.999){auto=false;e.target.textContent='Auto-Scroll';clearInterval(timer);return}window.scrollBy({top:3,behavior:'instant'})},25)};room(0);update()})();
+</script>
+</body>
+</html>
